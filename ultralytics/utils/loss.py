@@ -198,9 +198,9 @@ class v8DetectionLoss:
         """Initialize v8DetectionLoss with model parameters and task-aligned assignment settings."""
         device = next(model.parameters()).device  # get model device
         h = model.args  # hyperparameters
-
+        pos_weight = pos_weight=None if h.cls_weights is None else h.cls_weights.to(device)
         m = model.model[-1]  # Detect() module
-        self.bce = nn.BCEWithLogitsLoss(reduction='none', pos_weight=None if h.cls_weights is None else h.cls_weights.to(device))
+        self.bce = nn.BCEWithLogitsLoss(reduction="none", pos_weight=pos_weight)
         self.hyp = h
         self.stride = m.stride  # model strides
         self.nc = m.nc  # number of classes
