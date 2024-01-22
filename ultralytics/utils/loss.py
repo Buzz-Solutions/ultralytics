@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision.ops import sigmoid_focal_loss
 
 from ultralytics.utils.metrics import OKS_SIGMA
 from ultralytics.utils.ops import crop_mask, xywh2xyxy, xyxy2xywh
@@ -72,7 +73,7 @@ class FocalLoss(nn.Module):
         # p_t = torch.exp(-loss)
         # loss *= self.alpha * (1.000001 - p_t) ** self.gamma  # non-zero power for gradient stability
 
-        # TF implementation https://github.com/tensorflow/addons/blob/v0.7.1/tensorflow_addons/losses/focal_loss.py
+        # torchvision implementation: https://pytorch.org/vision/main/_modules/torchvision/ops/focal_loss.html
         pred_prob = pred.sigmoid()  # prob from logits
         p_t = label * pred_prob + (1 - label) * (1 - pred_prob)
         modulating_factor = (1.0 - p_t) ** self.gamma
@@ -81,7 +82,7 @@ class FocalLoss(nn.Module):
             self.alpha = self.alpha.to(device=pred.device, dtype=pred.dtype)
             alpha_factor = label * self.alpha + (1 - label) * (1 - self.alpha)
             loss *= alpha_factor
-        return loss.mean(1).sum()
+        return loss
 
 
 class DFLoss(nn.Module):
