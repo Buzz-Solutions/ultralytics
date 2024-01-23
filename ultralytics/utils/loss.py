@@ -356,7 +356,7 @@ class v8SegmentationLoss(v8DetectionLoss):
 
         # Cls loss
         # loss[1] = self.varifocal_loss(pred_scores, target_scores, target_labels) / target_scores_sum  # VFL way
-        loss[2] = self.bce(pred_scores, target_scores.to(dtype)).sum() / target_scores_sum  # BCE
+        loss[2] = self.class_loss(pred_scores, target_scores.to(dtype)).sum() / target_scores_sum  # BCE or FL
 
         if fg_mask.sum():
             # Bbox loss
@@ -536,7 +536,7 @@ class v8PoseLoss(v8DetectionLoss):
 
         # Cls loss
         # loss[1] = self.varifocal_loss(pred_scores, target_scores, target_labels) / target_scores_sum  # VFL way
-        loss[3] = self.bce(pred_scores, target_scores.to(dtype)).sum() / target_scores_sum  # BCE
+        loss[3] = self.class_loss(pred_scores, target_scores.to(dtype)).sum() / target_scores_sum  # BCE or FL
 
         # Bbox loss
         if fg_mask.sum():
@@ -734,7 +734,7 @@ class v8OBBLoss(v8DetectionLoss):
 
         # Cls loss
         # loss[1] = self.varifocal_loss(pred_scores, target_scores, target_labels) / target_scores_sum  # VFL way
-        loss[1] = self.bce(pred_scores, target_scores.to(dtype)).sum() / target_scores_sum  # BCE
+        loss[1] = self.class_loss(pred_scores, target_scores.to(dtype)).sum() / target_scores_sum  # BCE or FL
 
         # Bbox loss
         if fg_mask.sum():
