@@ -59,7 +59,6 @@ Pip install the ultralytics package including all [requirements](https://github.
 pip install -e .
 ```
 
-
 </details>
 
 <details open>
