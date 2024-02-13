@@ -249,9 +249,9 @@ class BaseTrainer:
         )
 
     def calc_weights(self):
-        """Determines weight mode and returns calculated, user submitted, or no class weights"""
+        """Determines weight mode and returns calculated, user submitted, or no class weights."""
         cls_weights = self.args.cls_weights
-        nc = self.data['nc']
+        nc = self.data["nc"]
 
         # decide if we're calculating class weights or not
         if cls_weights is None:
@@ -281,12 +281,7 @@ class BaseTrainer:
         return cls_weights
 
     def get_inverse_class_frequency_weights(
-            self,
-            nc,
-            effective=False,
-            effective_beta=0.999,
-            median_norm=False,
-            sqrt=False
+        self, nc, effective=False, effective_beta=0.999, median_norm=False, sqrt=False
     ):
         """
         Calculates inverse class frequency weights for use in loss function
@@ -294,26 +289,23 @@ class BaseTrainer:
 
         Args:
             nc (int): number of classes
-            effective (bool): whether to use effective class count or not. supercedes median_norm and sqrt if True
+            effective (bool): whether to use effective class count or not. supersedes median_norm and sqrt if True
             effective_beta (float): beta value for effective class count. Only used if effective is True
             median_norm (bool): whether to normalize weights by median or not
             sqrt (bool): whether to square root weights or not
         Returns:
             torch.Tensor: class weights
         """
-        loader = self.get_dataloader(self.trainset, batch_size=self.batch_size, rank=-1, mode='val')
+        loader = self.get_dataloader(self.trainset, batch_size=self.batch_size, rank=-1, mode="val")
 
-        y = [batch['cls'].view(-1).numpy() for batch in loader]
+        y = [batch["cls"].view(-1).numpy() for batch in loader]
         y = list(chain(*y))
-        
+
         unique_classes, class_counts = np.unique(y, return_counts=True)
         if len(class_counts) != nc:
             eps = 0.0001  # included for numerical stability
             class_counts = np.array(
-                [
-                    eps if a not in unique_classes else
-                    class_counts[list(unique_classes).index(a)] for a in np.arange(nc)
-                ]
+                [eps if a not in unique_classes else class_counts[list(unique_classes).index(a)] for a in np.arange(nc)]
             )
 
         if effective:
@@ -327,13 +319,13 @@ class BaseTrainer:
         if median_norm:
             class_weights *= np.median(class_counts)
         else:
-            class_weights *= (len(y) / nc)
+            class_weights *= len(y) / nc
 
         if sqrt:
             class_weights = np.sqrt(class_weights)
-            
+
         return torch.Tensor(class_weights)
-    
+
     def _setup_train(self, world_size):
         """Build dataloaders and optimizer on correct rank process."""
         # Model
