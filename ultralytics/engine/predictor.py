@@ -257,7 +257,7 @@ class BasePredictor:
                             LOGGER.debug(f"{embeds[1].shape=} 114")
                             LOGGER.debug(f"{embeds[2].shape=} 57")
 
-               # Postprocess
+                # Postprocess
                 with profilers[2]:
                     res = self.postprocess(preds, im, im0s)
                     self.results = res
@@ -267,10 +267,11 @@ class BasePredictor:
                 for i in range(n):
                     self.seen += 1
                     self.results[i].speed = {
-                        'preprocess': profilers[0].dt * 1E3 / n,
-                        'inference': profilers[1].dt * 1E3 / n,
-                        'postprocess': profilers[2].dt * 1E3 / n}
-                    
+                        "preprocess": profilers[0].dt * 1e3 / n,
+                        "inference": profilers[1].dt * 1e3 / n,
+                        "postprocess": profilers[2].dt * 1e3 / n,
+                    }
+
                     if self.args.embed:
                         self.results[i].embeddings = embeds
 

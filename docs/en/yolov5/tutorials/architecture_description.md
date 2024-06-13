@@ -82,7 +82,7 @@ def main():
     print(f"SPPF time: {time.time() - t_start}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 ```
 

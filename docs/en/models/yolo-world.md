@@ -76,10 +76,10 @@ Object detection is straightforward with the `predict` method, as illustrated be
         from ultralytics import YOLOWorld
 
         # Initialize a YOLO-World model
-        model = YOLOWorld('yolov8s-world.pt')  # or select yolov8m/l-world.pt for different sizes
+        model = YOLOWorld("yolov8s-world.pt")  # or select yolov8m/l-world.pt for different sizes
 
         # Execute inference with the YOLOv8s-world model on the specified image
-        results = model.predict('path/to/image.jpg')
+        results = model.predict("path/to/image.jpg")
 
         # Show results
         results[0].show()
@@ -106,10 +106,10 @@ Model validation on a dataset is streamlined as follows:
         from ultralytics import YOLO
 
         # Create a YOLO-World model
-        model = YOLO('yolov8s-world.pt')  # or select yolov8m/l-world.pt for different sizes
+        model = YOLO("yolov8s-world.pt")  # or select yolov8m/l-world.pt for different sizes
 
         # Conduct model validation on the COCO8 example dataset
-        metrics = model.val(data='coco8.yaml')
+        metrics = model.val(data="coco8.yaml")
         ```
 
     === "CLI"
@@ -139,13 +139,13 @@ For instance, if your application only requires detecting 'person' and 'bus' obj
         from ultralytics import YOLO
 
         # Initialize a YOLO-World model
-        model = YOLO('yolov8s-world.pt')  # or choose yolov8m/l-world.pt
-        
+        model = YOLO("yolov8s-world.pt")  # or choose yolov8m/l-world.pt
+
         # Define custom classes
         model.set_classes(["person", "bus"])
 
         # Execute prediction for specified categories on an image
-        results = model.predict('path/to/image.jpg')
+        results = model.predict("path/to/image.jpg")
 
         # Show results
         results[0].show()
@@ -163,8 +163,8 @@ You can also save a model after setting custom classes. By doing this you create
         from ultralytics import YOLO
 
         # Initialize a YOLO-World model
-        model = YOLO('yolov8s-world.pt')  # or select yolov8m/l-world.pt
-        
+        model = YOLO("yolov8s-world.pt")  # or select yolov8m/l-world.pt
+
         # Define custom classes
         model.set_classes(["person", "bus"])
 
@@ -178,10 +178,10 @@ You can also save a model after setting custom classes. By doing this you create
         from ultralytics import YOLO
 
         # Load your custom model
-        model = YOLO('custom_yolov8s.pt')
+        model = YOLO("custom_yolov8s.pt")
 
         # Run inference to detect your custom classes
-        results = model.predict('path/to/image.jpg')
+        results = model.predict("path/to/image.jpg")
 
         # Show results
         results[0].show()
