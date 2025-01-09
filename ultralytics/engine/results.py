@@ -77,7 +77,8 @@ class Results(SimpleClass):
         speed (dict): Dictionary of preprocess, inference, and postprocess speeds (ms/image).
         names (dict): Dictionary of class names.
         path (str): Path to the image file.
-        embeddings (torch.Tensor): Embeddings of the detected objects.
+        img_embeddings (torch.Tensor): Embeddings of the detected objects.
+        box_embeddings (torch.Tensor): Embeddings of the detected objects.
 
     Methods:
         update(boxes=None, masks=None, probs=None, obb=None): Updates object attributes with new detection results.
@@ -92,7 +93,8 @@ class Results(SimpleClass):
         verbose(): Returns a log string for each task, detailing detections and classifications.
         save_txt(txt_file, save_conf=False): Saves detection results to a text file.
         save_crop(save_dir, file_name=Path("im.jpg")): Saves cropped detection images.
-        save_embeddings(save_dir, file_name=Path("im.pt")): Saves embeddings to a file.
+        save_img_embedding(save_dir, file_name=Path("im.pt")): Saves img level embeddings to a file.
+        save_box_embeddings(save_dir, file_name=Path("im.pt")): Saves patch level embeddings to a file.
         tojson(normalize=False): Converts detection results to JSON format.
     """
 
