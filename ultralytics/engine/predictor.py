@@ -247,11 +247,13 @@ class BasePredictor:
                 # Inference
                 with profilers[1]:
                     preds = self.inference(im, *args, **kwargs)
-                    embeds = preds[1]  # a list of the embedding tensors
+                    embeds = preds[1]  # a list of the embedding tensors (N_layers(B, E))
                     preds = preds[0]  # preserve preds shape for downstream tasks
 
                 # Postprocess
                 with profilers[2]:
+                    # idxs is a list n (num images) long, with each element being a tensor
+                    # each tensor is (1, num objects) long, with each element being the index of corresponding object
                     res, idxs = self.postprocess(preds, im, im0s)
                     self.results = res
 
@@ -260,12 +262,14 @@ class BasePredictor:
                     img_embeddings = nn.functional.adaptive_avg_pool2d(embeds[-1], (1, 1)).squeeze()
                     # normalize the embeddings
                     img_embeddings = img_embeddings.T.div(img_embeddings.norm(p=2, dim=-1)).T
+                    # img_embeddings.shape = (n_images, E_img)
 
                     if len(idxs) > 0 and self.args.task == "detect":
                         obj_embeddings = []
                         # get the embeddings for the predicted objects
                         # for each image in the batch
-                        for i in range(len(idxs)):
+                        for i in range(len(self.results)):
+                            # TODO: reapproach this so that all configs output the same size vector
                             smol = np.gcd.reduce([x.shape[1] for x in embeds])
                             obj_feats = torch.cat(
                                 [
@@ -277,8 +281,9 @@ class BasePredictor:
                                     for x in embeds
                                 ],
                                 dim=0,
-                            )
-                            obj_embeddings.append(obj_feats[idxs[i].tolist()])
+                            ) # (n_candidates, E_obj)
+                            selected = obj_feats[idxs[i].tolist()] # (n_objects, E_obj)
+                            obj_embeddings.append(selected)
 
                 # Visualize, save, write results
                 n = len(im0s)
