@@ -77,6 +77,7 @@ class Results(SimpleClass):
         speed (dict): Dictionary of preprocess, inference, and postprocess speeds (ms/image).
         names (dict): Dictionary of class names.
         path (str): Path to the image file.
+        embeddings (torch.Tensor): Embeddings of the detected objects.
 
     Methods:
         update(boxes=None, masks=None, probs=None, obb=None): Updates object attributes with new detection results.
@@ -91,6 +92,7 @@ class Results(SimpleClass):
         verbose(): Returns a log string for each task, detailing detections and classifications.
         save_txt(txt_file, save_conf=False): Saves detection results to a text file.
         save_crop(save_dir, file_name=Path("im.jpg")): Saves cropped detection images.
+        save_embeddings(save_dir, file_name=Path("im.pt")): Saves embeddings to a file.
         tojson(normalize=False): Converts detection results to JSON format.
     """
 
@@ -120,6 +122,8 @@ class Results(SimpleClass):
         self.path = path
         self.save_dir = None
         self._keys = "boxes", "masks", "probs", "keypoints", "obb"
+        self.box_embeddings = None
+        self.img_embedding = None
 
     def __getitem__(self, idx):
         """Return a Results object for the specified index."""
@@ -384,6 +388,34 @@ class Results(SimpleClass):
                 file=Path(save_dir) / self.names[int(d.cls)] / f"{Path(file_name)}.jpg",
                 BGR=True,
             )
+
+    def save_box_embeddings(self, save_dir, file_name=Path("im.pt")):
+        """
+        Save embeddings to `save_dir/cls/file_name.pt`.
+
+        Args:
+            save_dir (str | pathlib.Path): Save path.
+            file_name (str | pathlib.Path): File name.
+        """
+        if self.box_embeddings is None:
+            LOGGER.warning("Warning: Embeddings are not available.")
+            return
+        Path(save_dir).mkdir(parents=True, exist_ok=True)  # make directory
+        torch.save(self.box_embeddings, Path(save_dir) / f"{Path(file_name)}.pt")
+
+    def save_img_embedding(self, save_dir, file_name=Path("im.pt")):
+        """
+        Save image embeddings to `save_dir/file_name.pt`.
+
+        Args:
+            save_dir (str | pathlib.Path): Save path.
+            file_name (str | pathlib.Path): File name.
+        """
+        if self.img_embedding is None:
+            LOGGER.warning("Warning: Image embedding is not available.")
+            return
+        Path(save_dir).mkdir(parents=True, exist_ok=True)  # make directory
+        torch.save(self.img_embedding, Path(save_dir) / f"{Path(file_name)}.pt")
 
     def tojson(self, normalize=False):
         """Convert the object to JSON format."""

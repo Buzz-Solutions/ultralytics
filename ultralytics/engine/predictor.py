@@ -37,6 +37,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import torch
+import torch.nn as nn
 
 from ultralytics.cfg import get_cfg, get_save_dir
 from ultralytics.data import load_inference_source
@@ -157,7 +158,7 @@ class BasePredictor:
 
     def postprocess(self, preds, img, orig_imgs):
         """Post-processes predictions for an image and returns them."""
-        return preds
+        return preds, []
 
     def __call__(self, source=None, model=None, stream=False, *args, **kwargs):
         """Performs inference on an image or stream."""
@@ -242,25 +243,39 @@ class BasePredictor:
                 # Preprocess
                 with profilers[0]:
                     im = self.preprocess(im0s)
-
+                    
                 # Inference
                 with profilers[1]:
                     preds = self.inference(im, *args, **kwargs)
-                    if self.args.embed:
-                        embeds = preds[1]  # a list of the embedding tensors
-                        preds = preds[0]  # preserve preds shape for downstream tasks
-
-                        # debug statements for good measure
-                        if self.args.debug:
-                            LOGGER.debug(f"(B, c+4+n_masks, n_boxes): {preds.shape=}")
-                            LOGGER.debug(f"{embeds[0].shape=} 228")
-                            LOGGER.debug(f"{embeds[1].shape=} 114")
-                            LOGGER.debug(f"{embeds[2].shape=} 57")
+                    embeds = preds[1]  # a list of the embedding tensors
+                    preds = preds[0]  # preserve preds shape for downstream tasks
 
                 # Postprocess
                 with profilers[2]:
-                    res = self.postprocess(preds, im, im0s)
+                    res, idxs = self.postprocess(preds, im, im0s)
                     self.results = res
+
+                # Extract embeddings
+                if self.args.embed:
+                    img_embeddings = nn.functional.adaptive_avg_pool2d(embeds[-1], (1,1)).squeeze()
+                    # normalize the embeddings
+                    img_embeddings = img_embeddings.T.div(img_embeddings.norm(p=2, dim=-1)).T
+
+                    if len(idxs) > 0 and self.args.task == "detect":
+                        obj_embeddings = []
+                        # get the embeddings for the predicted objects
+                        # for each image in the batch
+                        for i in range(len(idxs)):
+                            smol = np.gcd.reduce([x.shape[1] for x in embeds])
+                            obj_feats = torch.cat(
+                                [
+                                    x[i].unsqueeze(0).permute(0, 2, 3, 1)
+                                    .reshape(-1, smol, x.shape[1] // smol)
+                                    .mean(dim=-1) for x in embeds
+                                ],
+                                dim=0
+                            )
+                            obj_embeddings.append(obj_feats[idxs[i].tolist()])
 
                 # Visualize, save, write results
                 n = len(im0s)
@@ -273,7 +288,9 @@ class BasePredictor:
                     }
 
                     if self.args.embed:
-                        self.results[i].embeddings = embeds
+                        self.results[i].img_embedding = img_embeddings[i]
+                        if len(idxs) > 0 and self.args.task == "detect":
+                            self.results[i].box_embeddings = obj_embeddings[i]
 
                     if self.args.verbose or self.args.save or self.args.save_txt or self.args.show:
                         s[i] += self.write_results(i, Path(paths[i]), im, s)
@@ -353,6 +370,9 @@ class BasePredictor:
             result.save_txt(f"{self.txt_path}.txt", save_conf=self.args.save_conf)
         if self.args.save_crop:
             result.save_crop(save_dir=self.save_dir / "crops", file_name=self.txt_path.stem)
+        if self.args.embed:
+            result.save_img_embedding(save_dir=self.save_dir / "img_embeddings", file_name=self.txt_path.stem)
+            result.save_box_embeddings(save_dir=self.save_dir / "box_embeddings", file_name=self.txt_path.stem)
         if self.args.show:
             self.show(str(p))
         if self.args.save:

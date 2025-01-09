@@ -130,10 +130,9 @@ class BaseModel(nn.Module):
             if visualize:
                 feature_visualization(x, m.type, m.i, save_dir=visualize)
             if embed and m.i in embed:
-                embeddings.append(nn.functional.adaptive_avg_pool2d(x, (1, 1)).squeeze(-1).squeeze(-1))  # flatten
-                if m.i == max(embed):
-                    return torch.unbind(torch.cat(embeddings, 1), dim=0)
-        return x
+                embeddings.append(x)
+
+        return x, embeddings
 
     def _predict_augment(self, x):
         """Perform augmentations on input image x and return augmented inference."""

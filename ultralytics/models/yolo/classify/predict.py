@@ -58,4 +58,4 @@ class ClassificationPredictor(BasePredictor):
             orig_img = orig_imgs[i]
             img_path = self.batch[0][i]
             results.append(Results(orig_img, path=img_path, names=self.model.names, probs=pred))
-        return results
+        return results, []

@@ -205,6 +205,8 @@ def non_max_suppression(
         (List[torch.Tensor]): A list of length batch_size, where each element is a tensor of
             shape (num_boxes, 6 + num_masks) containing the kept boxes, with columns
             (x1, y1, x2, y2, confidence, class, mask1, mask2, ...).
+        (List[torch.Tensor]): A list of length batch_size, where each element is a tensor of
+            shape [1, num_boxes] containing the indices of the kept boxes.
     """
 
     # Checks
@@ -233,10 +235,19 @@ def non_max_suppression(
 
     t = time.time()
     output = [torch.zeros((0, 6 + nm), device=prediction.device)] * bs
+    feati = [torch.zeros((0, 1), device=prediction.device)] * bs
     for xi, x in enumerate(prediction):  # image index, image inference
+        # To keep track of the prediction indices that remain at the end, we create an indices
+        # list that will be applied the same filters that get applied to the original predictions.
+        # That way, at the end, we will have xk with only the indices of the predictions that
+        # have not been eliminated.
+        xk = torch.tensor([list(range(len(i))) for i in xc[xi].unsqueeze(0)], device=prediction.device).transpose(-1, -2)
+        
         # Apply constraints
         # x[((x[:, 2:4] < min_wh) | (x[:, 2:4] > max_wh)).any(1), 4] = 0  # width-height
-        x = x[xc[xi]]  # confidence
+        filt = xc[xi]
+        x = x[filt]  # confidence
+        xk = xk[filt]  # indices update
 
         # Cat apriori labels if autolabelling
         if labels and len(labels[xi]) and not rotated:
@@ -256,20 +267,27 @@ def non_max_suppression(
         if multi_label:
             i, j = torch.where(cls > conf_thres)
             x = torch.cat((box[i], x[i, 4 + j, None], j[:, None].float(), mask[i]), 1)
+            xk = xk[i] # indices update
         else:  # best class only
             conf, j = cls.max(1, keepdim=True)
-            x = torch.cat((box, conf, j.float(), mask), 1)[conf.view(-1) > conf_thres]
+            filt = conf.view(-1) > conf_thres
+            x = torch.cat((box, conf, j.float(), mask), 1)[filt]
+            xk = xk[filt]  # indices update
 
         # Filter by class
         if classes is not None:
-            x = x[(x[:, 5:6] == torch.tensor(classes, device=x.device)).any(1)]
+            filt = (x[:, 5:6] == classes).any(1)
+            x = x[filt]
+            xk = xk[filt] # indices update
 
         # Check shape
         n = x.shape[0]  # number of boxes
         if not n:  # no boxes
             continue
         if n > max_nms:  # excess boxes
-            x = x[x[:, 4].argsort(descending=True)[:max_nms]]  # sort by confidence and remove excess boxes
+            filt = x[:, 4].argsort(descending=True)[:max_nms]
+            x = x[filt]  # sort by confidence and remove excess boxes
+            xk = xk[filt]  # indices update
 
         # Batched NMS
         c = x[:, 5:6] * (0 if agnostic else max_wh)  # classes
@@ -293,13 +311,16 @@ def non_max_suppression(
         #     redundant = True  # require redundant detections
         #     if redundant:
         #         i = i[iou.sum(1) > 1]  # require redundancy
-
         output[xi] = x[i]
+        # xk would contain the indices of the predictions that are in x,
+        # i.e. you could index the `prediction` variable at the beginning of this function
+        # and get the final x (in xyxy format)
+        feati[xi] = xk[i].reshape(-1)
         if (time.time() - t) > time_limit:
             LOGGER.warning(f"WARNING ⚠️ NMS time limit {time_limit:.3f}s exceeded")
             break  # time limit exceeded
 
-    return output
+    return output, feati
 
 
 def clip_boxes(boxes, shape):

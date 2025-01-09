@@ -32,7 +32,7 @@ class PosePredictor(DetectionPredictor):
 
     def postprocess(self, preds, img, orig_imgs):
         """Return detection results for a given input image or list of images."""
-        preds = ops.non_max_suppression(
+        preds, idxs = ops.non_max_suppression(
             preds,
             self.args.conf,
             self.args.iou,
@@ -55,4 +55,4 @@ class PosePredictor(DetectionPredictor):
             results.append(
                 Results(orig_img, path=img_path, names=self.model.names, boxes=pred[:, :6], keypoints=pred_kpts)
             )
-        return results
+        return results, idxs
