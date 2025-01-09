@@ -117,9 +117,10 @@ Predict mode is used for making predictions using a trained YOLOv8 model on new 
     === "From source"
 
         ```python
-        from ultralytics import YOLO
-        from PIL import Image
         import cv2
+        from PIL import Image
+
+        from ultralytics import YOLO
 
         model = YOLO("model.pt")
         # accepts all formats - image/dir/Path/URL/video/PIL/ndarray. 0 for webcam
@@ -298,7 +299,7 @@ Explorer API can be used to explore datasets with advanced semantic, vector-simi
 !!! Tip "Detection Trainer Example"
 
         ```python
-        from ultralytics.models.yolo import DetectionTrainer, DetectionValidator, DetectionPredictor
+        from ultralytics.models.yolo import DetectionPredictor, DetectionTrainer, DetectionValidator
 
         # trainer
         trainer = DetectionTrainer(overrides={})

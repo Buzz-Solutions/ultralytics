@@ -23,8 +23,8 @@ Measuring the gap between two objects is known as distance calculation within a 
 
 ## Visuals
 
-|                                                  Distance Calculation using Ultralytics YOLOv8                                                  |                                                                
-|:-----------------------------------------------------------------------------------------------------------------------------------------------:|
+|                                                  Distance Calculation using Ultralytics YOLOv8                                                  |
+| :---------------------------------------------------------------------------------------------------------------------------------------------: |
 | ![Ultralytics YOLOv8 Distance Calculation](https://github.com/RizwanMunawar/RizwanMunawar/assets/62513924/6b6b735d-3c49-4b84-a022-2bf6e3c72f8b) |
 
 ## Advantages of Distance Calculation?
@@ -42,9 +42,10 @@ Measuring the gap between two objects is known as distance calculation within a 
     === "Video Stream"
 
         ```python
+        import cv2
+
         from ultralytics import YOLO
         from ultralytics.solutions import distance_calculation
-        import cv2
 
         model = YOLO("yolov8n.pt")
         names = model.model.names
@@ -83,7 +84,7 @@ Measuring the gap between two objects is known as distance calculation within a 
 ### Optional Arguments `set_args`
 
 | Name             | Type   | Default         | Description                                            |
-|------------------|--------|-----------------|--------------------------------------------------------|
+| ---------------- | ------ | --------------- | ------------------------------------------------------ |
 | `names`          | `dict` | `None`          | Classes names                                          |
 | `view_img`       | `bool` | `False`         | Display frames with counts                             |
 | `line_thickness` | `int`  | `2`             | Increase bounding boxes thickness                      |
@@ -93,7 +94,7 @@ Measuring the gap between two objects is known as distance calculation within a 
 ### Arguments `model.track`
 
 | Name      | Type    | Default        | Description                                                 |
-|-----------|---------|----------------|-------------------------------------------------------------|
+| --------- | ------- | -------------- | ----------------------------------------------------------- |
 | `source`  | `im0`   | `None`         | source directory for images or videos                       |
 | `persist` | `bool`  | `False`        | persisting tracks between frames                            |
 | `tracker` | `str`   | `botsort.yaml` | Tracking method 'bytetrack' or 'botsort'                    |

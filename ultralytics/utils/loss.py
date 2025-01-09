@@ -37,7 +37,7 @@ class VarifocalLoss(nn.Module):
 
 
 class FocalLoss(nn.Module):
-    """Implements variation of BCE loss used in RetinaNet: https://arxiv.org/abs/1708.02002"""
+    """Implements variation of BCE loss used in RetinaNet: https://arxiv.org/abs/1708.02002."""
 
     def __init__(self, pos_weight=None):
         """Initializer for FocalLoss class."""

@@ -135,7 +135,9 @@ deepsparse.server \
 An example request, using Python's `requests` package:
 
 ```python
-import requests, json
+import json
+
+import requests
 
 # list of images for inference (local files on client side)
 path = ["basilica.jpg"]

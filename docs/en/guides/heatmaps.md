@@ -30,7 +30,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
 ## Real World Applications
 
 |                                                                 Transportation                                                                  |                                                                 Retail                                                                  |
-|:-----------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------:|
+| :---------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------: |
 | ![Ultralytics YOLOv8 Transportation Heatmap](https://github.com/RizwanMunawar/ultralytics/assets/62513924/288d7053-622b-4452-b4e4-1f41aeb764aa) | ![Ultralytics YOLOv8 Retail Heatmap](https://github.com/RizwanMunawar/ultralytics/assets/62513924/edef75ad-50a7-4c0a-be4a-a66cdfc12802) |
 |                                                    Ultralytics YOLOv8 Transportation Heatmap                                                    |                                                    Ultralytics YOLOv8 Retail Heatmap                                                    |
 
@@ -44,9 +44,10 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
     === "Heatmap"
 
         ```python
+        import cv2
+
         from ultralytics import YOLO
         from ultralytics.solutions import heatmap
-        import cv2
 
         model = YOLO("yolov8n.pt")
         cap = cv2.VideoCapture("path/to/video/file.mp4")
@@ -78,9 +79,10 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
     === "Line Counting"
 
         ```python
+        import cv2
+
         from ultralytics import YOLO
         from ultralytics.solutions import heatmap
-        import cv2
 
         model = YOLO("yolov8n.pt")
         cap = cv2.VideoCapture("path/to/video/file.mp4")
@@ -116,9 +118,10 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
     === "Region Counting"
 
         ```python
+        import cv2
+
         from ultralytics import YOLO
         from ultralytics.solutions import heatmap
-        import cv2
 
         model = YOLO("yolov8n.pt")
         cap = cv2.VideoCapture("path/to/video/file.mp4")
@@ -155,9 +158,10 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
     === "Im0"
 
         ```python
+        import cv2
+
         from ultralytics import YOLO
         from ultralytics.solutions import heatmap
-        import cv2
 
         model = YOLO("yolov8s.pt")  # YOLOv8 custom/pretrained model
 
@@ -176,9 +180,10 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
     === "Specific Classes"
 
         ```python
+        import cv2
+
         from ultralytics import YOLO
         from ultralytics.solutions import heatmap
-        import cv2
 
         model = YOLO("yolov8n.pt")
         cap = cv2.VideoCapture("path/to/video/file.mp4")
@@ -212,7 +217,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
 ### Arguments `set_args`
 
 | Name                  | Type           | Default           | Description                                               |
-|-----------------------|----------------|-------------------|-----------------------------------------------------------|
+| --------------------- | -------------- | ----------------- | --------------------------------------------------------- |
 | `view_img`            | `bool`         | `False`           | Display the frame with heatmap                            |
 | `colormap`            | `cv2.COLORMAP` | `None`            | cv2.COLORMAP for heatmap                                  |
 | `imw`                 | `int`          | `None`            | Width of Heatmap                                          |
@@ -231,7 +236,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
 ### Arguments `model.track`
 
 | Name      | Type    | Default        | Description                                                 |
-|-----------|---------|----------------|-------------------------------------------------------------|
+| --------- | ------- | -------------- | ----------------------------------------------------------- |
 | `source`  | `im0`   | `None`         | source directory for images or videos                       |
 | `persist` | `bool`  | `False`        | persisting tracks between frames                            |
 | `tracker` | `str`   | `botsort.yaml` | Tracking method 'bytetrack' or 'botsort'                    |
@@ -242,7 +247,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
 ### Heatmap COLORMAPs
 
 | Colormap Name                   | Description                            |
-|---------------------------------|----------------------------------------|
+| ------------------------------- | -------------------------------------- |
 | `cv::COLORMAP_AUTUMN`           | Autumn color map                       |
 | `cv::COLORMAP_BONE`             | Bone color map                         |
 | `cv::COLORMAP_JET`              | Jet color map                          |

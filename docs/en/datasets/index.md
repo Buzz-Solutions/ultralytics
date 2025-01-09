@@ -121,6 +121,7 @@ Contributing a new dataset involves several steps to ensure that it aligns well 
 
     ```python
     from pathlib import Path
+
     from ultralytics.data.utils import compress_one_image
     from ultralytics.utils.downloads import zip_directory
 

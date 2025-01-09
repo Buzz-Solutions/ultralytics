@@ -59,7 +59,7 @@ The performance of YOLOv9 on the [COCO dataset](../datasets/detect/coco.md) exem
 **Table 1. Comparison of State-of-the-Art Real-Time Object Detectors**
 
 | Model                                                                                 | size<br><sup>(pixels) | AP<sup>val<br>50-95 | AP<sup>val<br>50 | AP<sup>val<br>75 | params<br><sup>(M) | FLOPs<br><sup>(B) |
-|---------------------------------------------------------------------------------------|-----------------------|---------------------|------------------|------------------|--------------------|-------------------|
+| ------------------------------------------------------------------------------------- | --------------------- | ------------------- | ---------------- | ---------------- | ------------------ | ----------------- |
 | YOLOv9-S                                                                              | 640                   | 46.8                | 63.4             | 50.7             | 7.2                | 26.7              |
 | YOLOv9-M                                                                              | 640                   | 51.4                | 68.1             | 56.1             | 20.1               | 76.8              |
 | [YOLOv9-C](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov9c.pt) | 640                   | 53.0                | 70.2             | 57.8             | 25.5               | 102.8             |
@@ -126,9 +126,9 @@ This example provides simple YOLOv9 training and inference examples. For full do
 The YOLOv9 series offers a range of models, each optimized for high-performance [Object Detection](../tasks/detect.md). These models cater to varying computational needs and accuracy requirements, making them versatile for a wide array of applications.
 
 | Model Type | Pre-trained Weights                                                                     | Tasks Supported                        | Inference | Validation | Training | Export |
-|------------|-----------------------------------------------------------------------------------------|----------------------------------------|-----------|------------|----------|--------|
-| YOLOv9-C   | [yolov9c.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov9c.pt) | [Object Detection](../tasks/detect.md) | ✅         | ✅          | ✅        | ✅      |
-| YOLOv9-E   | [yolov9e.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov9e.pt) | [Object Detection](../tasks/detect.md) | ✅         | ✅          | ✅        | ✅      |
+| ---------- | --------------------------------------------------------------------------------------- | -------------------------------------- | --------- | ---------- | -------- | ------ |
+| YOLOv9-C   | [yolov9c.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov9c.pt) | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ✅       | ✅     |
+| YOLOv9-E   | [yolov9e.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov9e.pt) | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ✅       | ✅     |
 
 This table provides a detailed overview of the YOLOv9 model variants, highlighting their capabilities in object detection tasks and their compatibility with various operational modes such as [Inference](../modes/predict.md), [Validation](../modes/val.md), [Training](../modes/train.md), and [Export](../modes/export.md). This comprehensive support ensures that users can fully leverage the capabilities of YOLOv9 models in a broad range of object detection scenarios.
 

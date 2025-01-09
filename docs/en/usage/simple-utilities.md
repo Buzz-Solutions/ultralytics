@@ -1,7 +1,7 @@
 ---
 comments: true
 description: Discover how to extend the utility of the Ultralytics package to support your development process.
-keywords: Ultralytics, YOLO, custom, function, workflow, utility, support, 
+keywords: Ultralytics, YOLO, custom, function, workflow, utility, support,
 ---
 
 # Simple Utilities
@@ -122,6 +122,7 @@ Compresses a single image file to reduced size while preserving its aspect ratio
 
 ```{ .py .annotate }
 from pathlib import Path
+
 from ultralytics.data.utils import compress_one_image
 
 for f in Path("path/to/dataset").rglob("*.jpg"):
@@ -158,6 +159,7 @@ Convert a single polygon (as list) to a binary mask of the specified image size.
 
 ```python
 import numpy as np
+
 from ultralytics.data.utils import polygon2mask
 
 imgsz = (1080, 810)
@@ -211,7 +213,7 @@ boxes.bboxes
 See the [`Bboxes` reference section](../reference/utils/instance.md#ultralytics.utils.instance.Bboxes) for more attributes and methods available.
 
 !!! tip
-    Many of the following functions (and more) can be accessed using the [`Bboxes` class](#bounding-box-horizontal-instances) but if you prefer to work with the functions directly, see the next subsections on how to import these independently. 
+Many of the following functions (and more) can be accessed using the [`Bboxes` class](#bounding-box-horizontal-instances) but if you prefer to work with the functions directly, see the next subsections on how to import these independently.
 
 ### Scaling Boxes
 
@@ -258,7 +260,7 @@ new_boxes#(1)!
 
 1. Bounding boxes scaled for the new image size
 
-### Bounding Box Format Conversions 
+### Bounding Box Format Conversions
 
 #### XYXY → XYWH
 
@@ -292,13 +294,7 @@ xywh
 ### All Bounding Box Conversions
 
 ```python
-from ultralytics.utils.ops import xywh2xyxy
-from ultralytics.utils.ops import xywhn2xyxy  # normalized → pixel
-from ultralytics.utils.ops import xyxy2xywhn  # pixel → normalized
-from ultralytics.utils.ops import xywh2ltwh  # xywh → top-left corner, w, h
-from ultralytics.utils.ops import xyxy2ltwh  # xyxy → top-left corner, w, h
-from ultralytics.utils.ops import ltwh2xywh
-from ultralytics.utils.ops import ltwh2xyxy
+
 ```
 
 See docstring for each function or visit the `ultralytics.utils.ops` [reference page](../reference/utils/ops.md) to read more about each function.
@@ -351,9 +347,11 @@ image_with_bboxes = ann.result()
 1. Names can be used from `model.names` when [working with detection results](../modes/predict.md#working-with-results)
 
 #### Oriented Bounding Boxes (OBB)
+
 ```python
 import cv2 as cv
 import numpy as np
+
 from ultralytics.utils.plotting import Annotator, colors
 
 obb_names = {10: "small vehicle"}
@@ -418,7 +416,7 @@ image_with_obb = ann.result()
 
 See the [`Annotator` Reference Page](../reference/utils/plotting.md#ultralytics.utils.plotting.Annotator) for additional insight.
 
-## Miscellaneous 
+## Miscellaneous
 
 ### Code Profiling
 

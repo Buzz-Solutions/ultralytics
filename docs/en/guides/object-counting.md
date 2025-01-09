@@ -30,7 +30,7 @@ Object counting with [Ultralytics YOLOv8](https://github.com/ultralytics/ultraly
 ## Real World Applications
 
 |                                                                           Logistics                                                                           |                                                                     Aquaculture                                                                     |
-|:-------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------:|
+| :-----------------------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------: |
 | ![Conveyor Belt Packets Counting Using Ultralytics YOLOv8](https://github.com/RizwanMunawar/ultralytics/assets/62513924/70e2d106-510c-4c6c-a57a-d34a765aa757) | ![Fish Counting in Sea using Ultralytics YOLOv8](https://github.com/RizwanMunawar/ultralytics/assets/62513924/c60d047b-3837-435f-8d29-bb9fc95d2191) |
 |                                                    Conveyor Belt Packets Counting Using Ultralytics YOLOv8                                                    |                                                    Fish Counting in Sea using Ultralytics YOLOv8                                                    |
 
@@ -39,9 +39,10 @@ Object counting with [Ultralytics YOLOv8](https://github.com/ultralytics/ultraly
     === "Count in Region"
 
         ```python
+        import cv2
+
         from ultralytics import YOLO
         from ultralytics.solutions import object_counter
-        import cv2
 
         model = YOLO("yolov8n.pt")
         cap = cv2.VideoCapture("path/to/video/file.mp4")
@@ -72,13 +73,14 @@ Object counting with [Ultralytics YOLOv8](https://github.com/ultralytics/ultraly
         video_writer.release()
         cv2.destroyAllWindows()
         ```
-    
+
     === "Count in Polygon"
 
         ```python
+        import cv2
+
         from ultralytics import YOLO
         from ultralytics.solutions import object_counter
-        import cv2
 
         model = YOLO("yolov8n.pt")
         cap = cv2.VideoCapture("path/to/video/file.mp4")
@@ -109,13 +111,14 @@ Object counting with [Ultralytics YOLOv8](https://github.com/ultralytics/ultraly
         video_writer.release()
         cv2.destroyAllWindows()
         ```
-    
+
     === "Count in Line"
 
         ```python
+        import cv2
+
         from ultralytics import YOLO
         from ultralytics.solutions import object_counter
-        import cv2
 
         model = YOLO("yolov8n.pt")
         cap = cv2.VideoCapture("path/to/video/file.mp4")
@@ -150,9 +153,10 @@ Object counting with [Ultralytics YOLOv8](https://github.com/ultralytics/ultraly
     === "Specific Classes"
 
         ```python
+        import cv2
+
         from ultralytics import YOLO
         from ultralytics.solutions import object_counter
-        import cv2
 
         model = YOLO("yolov8n.pt")
         cap = cv2.VideoCapture("path/to/video/file.mp4")
@@ -191,7 +195,7 @@ Object counting with [Ultralytics YOLOv8](https://github.com/ultralytics/ultraly
 ### Optional Arguments `set_args`
 
 | Name                  | Type        | Default                    | Description                                   |
-|-----------------------|-------------|----------------------------|-----------------------------------------------|
+| --------------------- | ----------- | -------------------------- | --------------------------------------------- |
 | `view_img`            | `bool`      | `False`                    | Display frames with counts                    |
 | `view_in_counts`      | `bool`      | `True`                     | Display in-counts only on video frame         |
 | `view_out_counts`     | `bool`      | `True`                     | Display out-counts only on video frame        |
@@ -211,7 +215,7 @@ Object counting with [Ultralytics YOLOv8](https://github.com/ultralytics/ultraly
 ### Arguments `model.track`
 
 | Name      | Type    | Default        | Description                                                 |
-|-----------|---------|----------------|-------------------------------------------------------------|
+| --------- | ------- | -------------- | ----------------------------------------------------------- |
 | `source`  | `im0`   | `None`         | source directory for images or videos                       |
 | `persist` | `bool`  | `False`        | persisting tracks between frames                            |
 | `tracker` | `str`   | `botsort.yaml` | Tracking method 'bytetrack' or 'botsort'                    |

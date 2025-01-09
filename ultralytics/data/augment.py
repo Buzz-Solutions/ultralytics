@@ -373,7 +373,6 @@ class RandomPerspective:
         self, degrees=0.0, translate=0.1, scale=0.5, shear=0.0, perspective=0.0, border=(0, 0), pre_transform=None
     ):
         """Initializes RandomPerspective object with transformation parameters."""
-
         self.degrees = degrees
         self.translate = translate
         self.scale = scale
@@ -395,7 +394,6 @@ class RandomPerspective:
             M (ndarray): Transformation matrix.
             s (float): Scale factor.
         """
-
         # Center
         C = np.eye(3, dtype=np.float32)
 
@@ -1025,7 +1023,6 @@ def classify_transforms(
     Returns:
         (T.Compose): torchvision transforms
     """
-
     if isinstance(size, (tuple, list)):
         assert len(size) == 2
         scale_size = tuple(math.floor(x / crop_fraction) for x in size)

@@ -75,7 +75,7 @@ To train DOTA dataset, we split original DOTA images with high-resolution into i
     === "Python"
 
         ```python
-        from ultralytics.data.split_dota import split_trainval, split_test
+        from ultralytics.data.split_dota import split_test, split_trainval
 
         # split train and val set, with labels.
         split_trainval(

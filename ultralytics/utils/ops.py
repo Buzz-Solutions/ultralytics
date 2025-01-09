@@ -208,7 +208,6 @@ def non_max_suppression(
         (List[torch.Tensor]): A list of length batch_size, where each element is a tensor of
             shape [1, num_boxes] containing the indices of the kept boxes.
     """
-
     # Checks
     assert 0 <= conf_thres <= 1, f"Invalid Confidence threshold {conf_thres}, valid values are between 0.0 and 1.0"
     assert 0 <= iou_thres <= 1, f"Invalid IoU {iou_thres}, valid values are between 0.0 and 1.0"
@@ -241,8 +240,10 @@ def non_max_suppression(
         # list that will be applied the same filters that get applied to the original predictions.
         # That way, at the end, we will have xk with only the indices of the predictions that
         # have not been eliminated.
-        xk = torch.tensor([list(range(len(i))) for i in xc[xi].unsqueeze(0)], device=prediction.device).transpose(-1, -2)
-        
+        xk = torch.tensor([list(range(len(i))) for i in xc[xi].unsqueeze(0)], device=prediction.device).transpose(
+            -1, -2
+        )
+
         # Apply constraints
         # x[((x[:, 2:4] < min_wh) | (x[:, 2:4] > max_wh)).any(1), 4] = 0  # width-height
         filt = xc[xi]
@@ -267,7 +268,7 @@ def non_max_suppression(
         if multi_label:
             i, j = torch.where(cls > conf_thres)
             x = torch.cat((box[i], x[i, 4 + j, None], j[:, None].float(), mask[i]), 1)
-            xk = xk[i] # indices update
+            xk = xk[i]  # indices update
         else:  # best class only
             conf, j = cls.max(1, keepdim=True)
             filt = conf.view(-1) > conf_thres
@@ -278,7 +279,7 @@ def non_max_suppression(
         if classes is not None:
             filt = (x[:, 5:6] == classes).any(1)
             x = x[filt]
-            xk = xk[filt] # indices update
+            xk = xk[filt]  # indices update
 
         # Check shape
         n = x.shape[0]  # number of boxes
@@ -612,7 +613,7 @@ def ltwh2xyxy(x):
 
 def segments2boxes(segments):
     """
-    It converts segment labels to box labels, i.e. (cls, xy1, xy2, ...) to (cls, xywh)
+    It converts segment labels to box labels, i.e. (cls, xy1, xy2, ...) to (cls, xywh).
 
     Args:
         segments (list): list of segments, each segment is a list of points, each point is a list of x, y coordinates
@@ -703,7 +704,6 @@ def process_mask(protos, masks_in, bboxes, shape, upsample=False):
         (torch.Tensor): A binary mask tensor of shape [n, h, w], where n is the number of masks after NMS, and h and w
             are the height and width of the input image. The mask is applied to the bounding boxes.
     """
-
     c, mh, mw = protos.shape  # CHW
     ih, iw = shape
     masks = (masks_in @ protos.float().view(c, -1)).sigmoid().view(-1, mh, mw)  # CHW
@@ -821,7 +821,7 @@ def regularize_rboxes(rboxes):
 
 def masks2segments(masks, strategy="largest"):
     """
-    It takes a list of masks(n,h,w) and returns a list of segments(n,xy)
+    It takes a list of masks(n,h,w) and returns a list of segments(n,xy).
 
     Args:
         masks (torch.Tensor): the output of the model, which is a tensor of shape (batch_size, 160, 160)
@@ -859,7 +859,7 @@ def convert_torch2numpy_batch(batch: torch.Tensor) -> np.ndarray:
 
 def clean_str(s):
     """
-    Cleans a string by replacing special characters with underscore _
+    Cleans a string by replacing special characters with underscore _.
 
     Args:
         s (str): a string needing special characters replaced

@@ -30,15 +30,7 @@ The Security Alarm System Project utilizing Ultralytics YOLOv8 integrates advanc
 #### Import Libraries
 
 ```python
-import torch
-import numpy as np
-import cv2
-from time import time
-from ultralytics import YOLO
-from ultralytics.utils.plotting import Annotator, colors
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+
 ```
 
 #### Set up the parameters of the message

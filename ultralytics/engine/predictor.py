@@ -243,7 +243,7 @@ class BasePredictor:
                 # Preprocess
                 with profilers[0]:
                     im = self.preprocess(im0s)
-                    
+
                 # Inference
                 with profilers[1]:
                     preds = self.inference(im, *args, **kwargs)
@@ -257,7 +257,7 @@ class BasePredictor:
 
                 # Extract embeddings
                 if self.args.embed:
-                    img_embeddings = nn.functional.adaptive_avg_pool2d(embeds[-1], (1,1)).squeeze()
+                    img_embeddings = nn.functional.adaptive_avg_pool2d(embeds[-1], (1, 1)).squeeze()
                     # normalize the embeddings
                     img_embeddings = img_embeddings.T.div(img_embeddings.norm(p=2, dim=-1)).T
 
@@ -269,11 +269,14 @@ class BasePredictor:
                             smol = np.gcd.reduce([x.shape[1] for x in embeds])
                             obj_feats = torch.cat(
                                 [
-                                    x[i].unsqueeze(0).permute(0, 2, 3, 1)
+                                    x[i]
+                                    .unsqueeze(0)
+                                    .permute(0, 2, 3, 1)
                                     .reshape(-1, smol, x.shape[1] // smol)
-                                    .mean(dim=-1) for x in embeds
+                                    .mean(dim=-1)
+                                    for x in embeds
                                 ],
-                                dim=0
+                                dim=0,
                             )
                             obj_embeddings.append(obj_feats[idxs[i].tolist()])
 
@@ -350,7 +353,7 @@ class BasePredictor:
             frame = int(match.group(1)) if match else None  # 0 if frame undetermined
 
         self.txt_path = self.save_dir / "labels" / (p.stem + ("" if self.dataset.mode == "image" else f"_{frame}"))
-        string += "%gx%g " % im.shape[2:]
+        string += "{:g}x{:g} ".format(*im.shape[2:])
         result = self.results[i]
         result.save_dir = self.save_dir.__str__()  # used in other locations
         string += result.verbose() + f"{result.speed['inference']:.1f}ms"

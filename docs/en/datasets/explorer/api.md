@@ -147,7 +147,6 @@ Note: This works using LLMs under the hood so the results are probabilistic and 
     from ultralytics import Explorer
     from ultralytics.data.explorer import plot_query_result
 
-
     # create an Explorer object
     exp = Explorer(data="coco128.yaml", model="yolov8n.pt")
     exp.create_embeddings_table()
@@ -298,10 +297,8 @@ sim_idx["im_file"][sim_count > 30]
 You can also visualize the embedding space using the plotting tool of your choice. For example here is a simple example using matplotlib:
 
 ```python
-import numpy as np
-from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+from sklearn.decomposition import PCA
 
 # Reduce dimensions using PCA to 3 components for visualization in 3D
 pca = PCA(n_components=3)
