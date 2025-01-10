@@ -225,7 +225,6 @@ def non_max_suppression(
     # have not been eliminated.
     xinds = torch.stack([torch.arange(len(i), device=prediction.device) for i in xc])[..., None]
 
-
     # Settings
     # min_wh = 2  # (pixels) minimum box width and height
     time_limit = 2.0 + max_time_img * bs  # seconds to quit after
@@ -242,8 +241,6 @@ def non_max_suppression(
     output = [torch.zeros((0, 6 + nm), device=prediction.device)] * bs
     feati = [torch.zeros((0, 1), device=prediction.device)] * bs
     for xi, (x, xk) in enumerate(zip(prediction, xinds)):  # image index, image inference
-        
-
         # Apply constraints
         # x[((x[:, 2:4] < min_wh) | (x[:, 2:4] > max_wh)).any(1), 4] = 0  # width-height
         filt = xc[xi]
