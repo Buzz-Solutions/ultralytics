@@ -400,7 +400,7 @@ class Results(SimpleClass):
             file_name (str | pathlib.Path): File name.
         """
         if self.box_embeddings is None:
-            LOGGER.warning("Warning: Embeddings are not available.")
+            LOGGER.warning("Warning: Box Embeddings are not available.")
             return
         Path(save_dir).mkdir(parents=True, exist_ok=True)  # make directory
         torch.save(self.box_embeddings, Path(save_dir) / f"{Path(file_name)}.pt")

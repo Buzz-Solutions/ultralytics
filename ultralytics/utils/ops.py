@@ -219,6 +219,12 @@ def non_max_suppression(
     nm = prediction.shape[1] - nc - 4
     mi = 4 + nc  # mask start index
     xc = prediction[:, 4:mi].amax(1) > conf_thres  # candidates
+    # To keep track of the prediction indices that remain at the end, we create an indices
+    # list that will be applied the same filters that get applied to the original predictions.
+    # That way, at the end, we will have xk with only the indices of the predictions that
+    # have not been eliminated.
+    xinds = torch.stack([torch.arange(len(i), device=prediction.device) for i in xc])[..., None]
+
 
     # Settings
     # min_wh = 2  # (pixels) minimum box width and height
@@ -235,14 +241,8 @@ def non_max_suppression(
     t = time.time()
     output = [torch.zeros((0, 6 + nm), device=prediction.device)] * bs
     feati = [torch.zeros((0, 1), device=prediction.device)] * bs
-    for xi, x in enumerate(prediction):  # image index, image inference
-        # To keep track of the prediction indices that remain at the end, we create an indices
-        # list that will be applied the same filters that get applied to the original predictions.
-        # That way, at the end, we will have xk with only the indices of the predictions that
-        # have not been eliminated.
-        xk = torch.tensor([list(range(len(i))) for i in xc[xi].unsqueeze(0)], device=prediction.device).transpose(
-            -1, -2
-        )
+    for xi, (x, xk) in enumerate(zip(prediction, xinds)):  # image index, image inference
+        
 
         # Apply constraints
         # x[((x[:, 2:4] < min_wh) | (x[:, 2:4] > max_wh)).any(1), 4] = 0  # width-height

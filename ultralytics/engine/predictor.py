@@ -258,18 +258,28 @@ class BasePredictor:
                     self.results = res
 
                 # Extract embeddings
+                # TODO: reapproach this so that all configs output the same size vectors
                 if self.args.embed:
                     img_embeddings = nn.functional.adaptive_avg_pool2d(embeds[-1], (1, 1)).squeeze()
+                    # keep batch dim for stability
+                    if len(img_embeddings.shape) == 1:
+                        img_embeddings = img_embeddings.unsqueeze(0)
+
                     # normalize the embeddings
                     img_embeddings = img_embeddings.T.div(img_embeddings.norm(p=2, dim=-1)).T
                     # img_embeddings.shape = (n_images, E_img)
 
-                    if len(idxs) > 0 and self.args.task == "detect":
+                    # Extract object embeddings
+                    if self.args.task == "detect":
                         obj_embeddings = []
                         # get the embeddings for the predicted objects
                         # for each image in the batch
                         for i in range(len(self.results)):
-                            # TODO: reapproach this so that all configs output the same size vector
+                            # if there are no objects in the image, append an empty tensor
+                            if len(idxs[i]) == 0:
+                                obj_embeddings.append(torch.empty(0))
+                                continue
+
                             smol = np.gcd.reduce([x.shape[1] for x in embeds])
                             obj_feats = torch.cat(
                                 [
@@ -380,7 +390,8 @@ class BasePredictor:
             result.save_crop(save_dir=self.save_dir / "crops", file_name=self.txt_path.stem)
         if self.args.embed:
             result.save_img_embedding(save_dir=self.save_dir / "img_embeddings", file_name=self.txt_path.stem)
-            result.save_box_embeddings(save_dir=self.save_dir / "box_embeddings", file_name=self.txt_path.stem)
+            if result.box_embeddings is not None and len(result.box_embeddings) > 0:
+                result.save_box_embeddings(save_dir=self.save_dir / "box_embeddings", file_name=self.txt_path.stem)
         if self.args.show:
             self.show(str(p))
         if self.args.save:
