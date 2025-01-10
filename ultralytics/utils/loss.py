@@ -7,6 +7,7 @@ import torch.nn.functional as F
 from ultralytics.utils.metrics import OKS_SIGMA
 from ultralytics.utils.ops import crop_mask, xywh2xyxy, xyxy2xywh
 from ultralytics.utils.tal import RotatedTaskAlignedAssigner, TaskAlignedAssigner, dist2bbox, dist2rbox, make_anchors
+
 from .metrics import bbox_iou, probiou
 from .tal import bbox2dist
 
@@ -36,7 +37,7 @@ class VarifocalLoss(nn.Module):
 
 
 class FocalLoss(nn.Module):
-    """Implements variation of BCE loss used in RetinaNet: https://arxiv.org/abs/1708.02002"""
+    """Implements variation of BCE loss used in RetinaNet: https://arxiv.org/abs/1708.02002."""
 
     def __init__(self, pos_weight=None):
         """Initializer for FocalLoss class."""

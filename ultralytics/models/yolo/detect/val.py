@@ -91,7 +91,7 @@ class DetectionValidator(BaseValidator):
             multi_label=True,
             agnostic=self.args.single_cls,
             max_det=self.args.max_det,
-        )
+        )[0]
 
     def _prepare_batch(self, si, batch):
         """Prepares a batch of images and annotations for validation."""
@@ -155,7 +155,7 @@ class DetectionValidator(BaseValidator):
             if self.args.save_json:
                 self.pred_to_json(predn, batch["im_file"][si])
             if self.args.save_txt:
-                file = self.save_dir / "labels" / f'{Path(batch["im_file"][si]).stem}.txt'
+                file = self.save_dir / "labels" / f"{Path(batch['im_file'][si]).stem}.txt"
                 self.save_one_txt(predn, self.args.save_conf, pbatch["ori_shape"], file)
 
     def finalize_metrics(self, *args, **kwargs):

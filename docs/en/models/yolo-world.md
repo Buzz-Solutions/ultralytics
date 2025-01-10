@@ -36,21 +36,21 @@ This section details the models available with their specific pre-trained weight
 
     All the YOLOv8-World weights have been directly migrated from the official [YOLO-World](https://github.com/AILab-CVC/YOLO-World) repository, highlighting their excellent contributions.
 
-| Model Type      | Pre-trained Weights                                                                                   | Tasks Supported                        | Inference | Validation | Training | Export |
-|-----------------|-------------------------------------------------------------------------------------------------------|----------------------------------------|-----------|------------|----------|--------|
-| YOLOv8s-world   | [yolov8s-world.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8s-world.pt)   | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ❌     |
+| Model Type      | Pre-trained Weights                                                                                     | Tasks Supported                        | Inference | Validation | Training | Export |
+| --------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------- | --------- | ---------- | -------- | ------ |
+| YOLOv8s-world   | [yolov8s-world.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8s-world.pt)     | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ❌     |
 | YOLOv8s-worldv2 | [yolov8s-worldv2.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8s-worldv2.pt) | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ✅     |
-| YOLOv8m-world   | [yolov8m-world.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8m-world.pt)   | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ❌     |
+| YOLOv8m-world   | [yolov8m-world.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8m-world.pt)     | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ❌     |
 | YOLOv8m-worldv2 | [yolov8m-worldv2.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8m-worldv2.pt) | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ✅     |
-| YOLOv8l-world   | [yolov8l-world.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8l-world.pt)   | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ❌     |
+| YOLOv8l-world   | [yolov8l-world.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8l-world.pt)     | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ❌     |
 | YOLOv8l-worldv2 | [yolov8l-worldv2.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8l-worldv2.pt) | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ✅     |
-| YOLOv8x-world   | [yolov8x-world.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8x-world.pt)   | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ❌     |
+| YOLOv8x-world   | [yolov8x-world.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8x-world.pt)     | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ❌     |
 | YOLOv8x-worldv2 | [yolov8x-worldv2.pt](https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8x-worldv2.pt) | [Object Detection](../tasks/detect.md) | ✅        | ✅         | ❌       | ✅     |
 
 ## Zero-shot Transfer on COCO Dataset
 
 | Model Type      | mAP  | mAP50 | mAP75 |
-|-----------------|------|-------|-------|
+| --------------- | ---- | ----- | ----- |
 | yolov8s-world   | 37.4 | 52.0  | 40.6  |
 | yolov8s-worldv2 | 37.7 | 52.2  | 41.0  |
 | yolov8m-world   | 42.0 | 57.0  | 45.6  |
@@ -76,10 +76,10 @@ Object detection is straightforward with the `predict` method, as illustrated be
         from ultralytics import YOLOWorld
 
         # Initialize a YOLO-World model
-        model = YOLOWorld('yolov8s-world.pt')  # or select yolov8m/l-world.pt for different sizes
+        model = YOLOWorld("yolov8s-world.pt")  # or select yolov8m/l-world.pt for different sizes
 
         # Execute inference with the YOLOv8s-world model on the specified image
-        results = model.predict('path/to/image.jpg')
+        results = model.predict("path/to/image.jpg")
 
         # Show results
         results[0].show()
@@ -106,10 +106,10 @@ Model validation on a dataset is streamlined as follows:
         from ultralytics import YOLO
 
         # Create a YOLO-World model
-        model = YOLO('yolov8s-world.pt')  # or select yolov8m/l-world.pt for different sizes
+        model = YOLO("yolov8s-world.pt")  # or select yolov8m/l-world.pt for different sizes
 
         # Conduct model validation on the COCO8 example dataset
-        metrics = model.val(data='coco8.yaml')
+        metrics = model.val(data="coco8.yaml")
         ```
 
     === "CLI"
@@ -139,13 +139,13 @@ For instance, if your application only requires detecting 'person' and 'bus' obj
         from ultralytics import YOLO
 
         # Initialize a YOLO-World model
-        model = YOLO('yolov8s-world.pt')  # or choose yolov8m/l-world.pt
-        
+        model = YOLO("yolov8s-world.pt")  # or choose yolov8m/l-world.pt
+
         # Define custom classes
         model.set_classes(["person", "bus"])
 
         # Execute prediction for specified categories on an image
-        results = model.predict('path/to/image.jpg')
+        results = model.predict("path/to/image.jpg")
 
         # Show results
         results[0].show()
@@ -163,8 +163,8 @@ You can also save a model after setting custom classes. By doing this you create
         from ultralytics import YOLO
 
         # Initialize a YOLO-World model
-        model = YOLO('yolov8s-world.pt')  # or select yolov8m/l-world.pt
-        
+        model = YOLO("yolov8s-world.pt")  # or select yolov8m/l-world.pt
+
         # Define custom classes
         model.set_classes(["person", "bus"])
 
@@ -178,10 +178,10 @@ You can also save a model after setting custom classes. By doing this you create
         from ultralytics import YOLO
 
         # Load your custom model
-        model = YOLO('custom_yolov8s.pt')
+        model = YOLO("custom_yolov8s.pt")
 
         # Run inference to detect your custom classes
-        results = model.predict('path/to/image.jpg')
+        results = model.predict("path/to/image.jpg")
 
         # Show results
         results[0].show()

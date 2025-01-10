@@ -205,8 +205,9 @@ def non_max_suppression(
         (List[torch.Tensor]): A list of length batch_size, where each element is a tensor of
             shape (num_boxes, 6 + num_masks) containing the kept boxes, with columns
             (x1, y1, x2, y2, confidence, class, mask1, mask2, ...).
+        (List[torch.Tensor]): A list of length batch_size, where each element is a tensor of
+            shape [1, num_boxes] containing the indices of the kept boxes.
     """
-
     # Checks
     assert 0 <= conf_thres <= 1, f"Invalid Confidence threshold {conf_thres}, valid values are between 0.0 and 1.0"
     assert 0 <= iou_thres <= 1, f"Invalid IoU {iou_thres}, valid values are between 0.0 and 1.0"
@@ -218,6 +219,11 @@ def non_max_suppression(
     nm = prediction.shape[1] - nc - 4
     mi = 4 + nc  # mask start index
     xc = prediction[:, 4:mi].amax(1) > conf_thres  # candidates
+    # To keep track of the prediction indices that remain at the end, we create an indices
+    # list that will be applied the same filters that get applied to the original predictions.
+    # That way, at the end, we will have xk with only the indices of the predictions that
+    # have not been eliminated.
+    xinds = torch.stack([torch.arange(len(i), device=prediction.device) for i in xc])[..., None]
 
     # Settings
     # min_wh = 2  # (pixels) minimum box width and height
@@ -233,10 +239,13 @@ def non_max_suppression(
 
     t = time.time()
     output = [torch.zeros((0, 6 + nm), device=prediction.device)] * bs
-    for xi, x in enumerate(prediction):  # image index, image inference
+    feati = [torch.zeros((0, 1), device=prediction.device)] * bs
+    for xi, (x, xk) in enumerate(zip(prediction, xinds)):  # image index, image inference
         # Apply constraints
         # x[((x[:, 2:4] < min_wh) | (x[:, 2:4] > max_wh)).any(1), 4] = 0  # width-height
-        x = x[xc[xi]]  # confidence
+        filt = xc[xi]
+        x = x[filt]  # confidence
+        xk = xk[filt]  # indices update
 
         # Cat apriori labels if autolabelling
         if labels and len(labels[xi]) and not rotated:
@@ -256,20 +265,27 @@ def non_max_suppression(
         if multi_label:
             i, j = torch.where(cls > conf_thres)
             x = torch.cat((box[i], x[i, 4 + j, None], j[:, None].float(), mask[i]), 1)
+            xk = xk[i]  # indices update
         else:  # best class only
             conf, j = cls.max(1, keepdim=True)
-            x = torch.cat((box, conf, j.float(), mask), 1)[conf.view(-1) > conf_thres]
+            filt = conf.view(-1) > conf_thres
+            x = torch.cat((box, conf, j.float(), mask), 1)[filt]
+            xk = xk[filt]  # indices update
 
         # Filter by class
         if classes is not None:
-            x = x[(x[:, 5:6] == torch.tensor(classes, device=x.device)).any(1)]
+            filt = (x[:, 5:6] == classes).any(1)
+            x = x[filt]
+            xk = xk[filt]  # indices update
 
         # Check shape
         n = x.shape[0]  # number of boxes
         if not n:  # no boxes
             continue
         if n > max_nms:  # excess boxes
-            x = x[x[:, 4].argsort(descending=True)[:max_nms]]  # sort by confidence and remove excess boxes
+            filt = x[:, 4].argsort(descending=True)[:max_nms]
+            x = x[filt]  # sort by confidence and remove excess boxes
+            xk = xk[filt]  # indices update
 
         # Batched NMS
         c = x[:, 5:6] * (0 if agnostic else max_wh)  # classes
@@ -293,13 +309,16 @@ def non_max_suppression(
         #     redundant = True  # require redundant detections
         #     if redundant:
         #         i = i[iou.sum(1) > 1]  # require redundancy
-
         output[xi] = x[i]
+        # xk would contain the indices of the predictions that are in x,
+        # i.e. you could index the `prediction` variable at the beginning of this function
+        # and get the final x (in xyxy format)
+        feati[xi] = xk[i].reshape(-1)
         if (time.time() - t) > time_limit:
             LOGGER.warning(f"WARNING ⚠️ NMS time limit {time_limit:.3f}s exceeded")
             break  # time limit exceeded
 
-    return output
+    return output, feati
 
 
 def clip_boxes(boxes, shape):
@@ -591,7 +610,7 @@ def ltwh2xyxy(x):
 
 def segments2boxes(segments):
     """
-    It converts segment labels to box labels, i.e. (cls, xy1, xy2, ...) to (cls, xywh)
+    It converts segment labels to box labels, i.e. (cls, xy1, xy2, ...) to (cls, xywh).
 
     Args:
         segments (list): list of segments, each segment is a list of points, each point is a list of x, y coordinates
@@ -682,7 +701,6 @@ def process_mask(protos, masks_in, bboxes, shape, upsample=False):
         (torch.Tensor): A binary mask tensor of shape [n, h, w], where n is the number of masks after NMS, and h and w
             are the height and width of the input image. The mask is applied to the bounding boxes.
     """
-
     c, mh, mw = protos.shape  # CHW
     ih, iw = shape
     masks = (masks_in @ protos.float().view(c, -1)).sigmoid().view(-1, mh, mw)  # CHW
@@ -800,7 +818,7 @@ def regularize_rboxes(rboxes):
 
 def masks2segments(masks, strategy="largest"):
     """
-    It takes a list of masks(n,h,w) and returns a list of segments(n,xy)
+    It takes a list of masks(n,h,w) and returns a list of segments(n,xy).
 
     Args:
         masks (torch.Tensor): the output of the model, which is a tensor of shape (batch_size, 160, 160)
@@ -838,7 +856,7 @@ def convert_torch2numpy_batch(batch: torch.Tensor) -> np.ndarray:
 
 def clean_str(s):
     """
-    Cleans a string by replacing special characters with underscore _
+    Cleans a string by replacing special characters with underscore _.
 
     Args:
         s (str): a string needing special characters replaced

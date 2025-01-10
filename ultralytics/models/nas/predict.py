@@ -34,12 +34,11 @@ class NASPredictor(BasePredictor):
 
     def postprocess(self, preds_in, img, orig_imgs):
         """Postprocess predictions and returns a list of Results objects."""
-
         # Cat boxes and class scores
         boxes = ops.xyxy2xywh(preds_in[0][0])
         preds = torch.cat((boxes, preds_in[0][1]), -1).permute(0, 2, 1)
 
-        preds = ops.non_max_suppression(
+        preds, idxs = ops.non_max_suppression(
             preds,
             self.args.conf,
             self.args.iou,
@@ -57,4 +56,4 @@ class NASPredictor(BasePredictor):
             pred[:, :4] = ops.scale_boxes(img.shape[2:], pred[:, :4], orig_img.shape)
             img_path = self.batch[0][i]
             results.append(Results(orig_img, path=img_path, names=self.model.names, boxes=pred))
-        return results
+        return results, idxs

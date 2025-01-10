@@ -29,7 +29,7 @@ class OBBPredictor(DetectionPredictor):
 
     def postprocess(self, preds, img, orig_imgs):
         """Post-processes predictions and returns a list of Results objects."""
-        preds = ops.non_max_suppression(
+        preds, idxs = ops.non_max_suppression(
             preds,
             self.args.conf,
             self.args.iou,
@@ -50,4 +50,4 @@ class OBBPredictor(DetectionPredictor):
             # xywh, r, conf, cls
             obb = torch.cat([rboxes, pred[:, 4:6]], dim=-1)
             results.append(Results(orig_img, path=img_path, names=self.model.names, obb=obb))
-        return results
+        return results, idxs

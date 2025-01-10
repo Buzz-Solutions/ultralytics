@@ -37,6 +37,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import torch
+import torch.nn as nn
 
 from ultralytics.cfg import get_cfg, get_save_dir
 from ultralytics.data import load_inference_source
@@ -157,7 +158,7 @@ class BasePredictor:
 
     def postprocess(self, preds, img, orig_imgs):
         """Post-processes predictions for an image and returns them."""
-        return preds
+        return preds, []
 
     def __call__(self, source=None, model=None, stream=False, *args, **kwargs):
         """Performs inference on an image or stream."""
@@ -246,14 +247,53 @@ class BasePredictor:
                 # Inference
                 with profilers[1]:
                     preds = self.inference(im, *args, **kwargs)
-                    if self.args.embed:
-                        yield from [preds] if isinstance(preds, torch.Tensor) else preds  # yield embedding tensors
-                        continue
+                    embeds = preds[1]  # a list of the embedding tensors (N_layers(B, E))
+                    preds = preds[0]  # preserve preds shape for downstream tasks
 
                 # Postprocess
                 with profilers[2]:
-                    self.results = self.postprocess(preds, im, im0s)
-                self.run_callbacks("on_predict_postprocess_end")
+                    # idxs is a list n (num images) long, with each element being a tensor
+                    # each tensor is (1, num objects) long, with each element being the index of corresponding object
+                    res, idxs = self.postprocess(preds, im, im0s)
+                    self.results = res
+
+                # Extract embeddings
+                # TODO: reapproach this so that all configs output the same size vectors
+                if self.args.embed:
+                    img_embeddings = nn.functional.adaptive_avg_pool2d(embeds[-1], (1, 1)).squeeze()
+                    # keep batch dim for stability
+                    if len(img_embeddings.shape) == 1:
+                        img_embeddings = img_embeddings.unsqueeze(0)
+
+                    # normalize the embeddings
+                    img_embeddings = img_embeddings.T.div(img_embeddings.norm(p=2, dim=-1)).T
+                    # img_embeddings.shape = (n_images, E_img)
+
+                    # Extract object embeddings
+                    if self.args.task == "detect":
+                        obj_embeddings = []
+                        # get the embeddings for the predicted objects
+                        # for each image in the batch
+                        for i in range(len(self.results)):
+                            # if there are no objects in the image, append an empty tensor
+                            if len(idxs[i]) == 0:
+                                obj_embeddings.append(torch.empty(0))
+                                continue
+
+                            smol = np.gcd.reduce([x.shape[1] for x in embeds])
+                            obj_feats = torch.cat(
+                                [
+                                    x[i]
+                                    .unsqueeze(0)
+                                    .permute(0, 2, 3, 1)
+                                    .reshape(-1, smol, x.shape[1] // smol)
+                                    .mean(dim=-1)
+                                    for x in embeds
+                                ],
+                                dim=0,
+                            )  # (n_candidates, E_obj)
+                            selected = obj_feats[idxs[i].tolist()]  # (n_objects, E_obj)
+                            obj_embeddings.append(selected)
 
                 # Visualize, save, write results
                 n = len(im0s)
@@ -264,6 +304,12 @@ class BasePredictor:
                         "inference": profilers[1].dt * 1e3 / n,
                         "postprocess": profilers[2].dt * 1e3 / n,
                     }
+
+                    if self.args.embed:
+                        self.results[i].img_embedding = img_embeddings[i]
+                        if len(idxs) > 0 and self.args.task == "detect":
+                            self.results[i].box_embeddings = obj_embeddings[i]
+
                     if self.args.verbose or self.args.save or self.args.save_txt or self.args.show:
                         s[i] += self.write_results(i, Path(paths[i]), im, s)
 
@@ -322,7 +368,7 @@ class BasePredictor:
             frame = int(match.group(1)) if match else None  # 0 if frame undetermined
 
         self.txt_path = self.save_dir / "labels" / (p.stem + ("" if self.dataset.mode == "image" else f"_{frame}"))
-        string += "%gx%g " % im.shape[2:]
+        string += "{:g}x{:g} ".format(*im.shape[2:])
         result = self.results[i]
         result.save_dir = self.save_dir.__str__()  # used in other locations
         string += result.verbose() + f"{result.speed['inference']:.1f}ms"
@@ -342,6 +388,10 @@ class BasePredictor:
             result.save_txt(f"{self.txt_path}.txt", save_conf=self.args.save_conf)
         if self.args.save_crop:
             result.save_crop(save_dir=self.save_dir / "crops", file_name=self.txt_path.stem)
+        if self.args.embed:
+            result.save_img_embedding(save_dir=self.save_dir / "img_embeddings", file_name=self.txt_path.stem)
+            if result.box_embeddings is not None and len(result.box_embeddings) > 0:
+                result.save_box_embeddings(save_dir=self.save_dir / "box_embeddings", file_name=self.txt_path.stem)
         if self.args.show:
             self.show(str(p))
         if self.args.save:
@@ -356,7 +406,7 @@ class BasePredictor:
         # Save videos and streams
         if self.dataset.mode in {"stream", "video"}:
             fps = self.dataset.fps if self.dataset.mode == "video" else 30
-            frames_path = f'{save_path.split(".", 1)[0]}_frames/'
+            frames_path = f"{save_path.split('.', 1)[0]}_frames/"
             if save_path not in self.vid_writer:  # new video
                 if self.args.save_frames:
                     Path(frames_path).mkdir(parents=True, exist_ok=True)

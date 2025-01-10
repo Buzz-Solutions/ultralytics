@@ -178,7 +178,7 @@ class Model(nn.Module):
 
     @staticmethod
     def is_triton_model(model: str) -> bool:
-        """Is model a Triton Server URL string, i.e. <scheme>://<netloc>/<endpoint>/<task_name>"""
+        """Is model a Triton Server URL string, i.e. <scheme>://<netloc>/<endpoint>/<task_name>."""
         from urllib.parse import urlsplit
 
         url = urlsplit(model)
@@ -309,8 +309,9 @@ class Model(nn.Module):
             AssertionError: If the model is not a PyTorch model.
         """
         self._check_is_pytorch_model()
-        from ultralytics import __version__
         from datetime import datetime
+
+        from ultralytics import __version__
 
         updates = {
             "date": datetime.now().isoformat(),

@@ -15,6 +15,7 @@ import psutil
 from torch.utils.data import Dataset
 
 from ultralytics.utils import DEFAULT_CFG, LOCAL_RANK, LOGGER, NUM_THREADS, TQDM
+
 from .utils import HELP_URL, IMG_FORMATS
 
 
@@ -216,9 +217,9 @@ class BaseDataset(Dataset):
         cache = mem_required < mem.available  # to cache or not to cache, that is the question
         if not cache:
             LOGGER.info(
-                f'{self.prefix}{mem_required / gb:.1f}GB RAM required to cache images '
-                f'with {int(safety_margin * 100)}% safety margin but only '
-                f'{mem.available / gb:.1f}/{mem.total / gb:.1f}GB available, '
+                f"{self.prefix}{mem_required / gb:.1f}GB RAM required to cache images "
+                f"with {int(safety_margin * 100)}% safety margin but only "
+                f"{mem.available / gb:.1f}/{mem.total / gb:.1f}GB available, "
                 f"{'caching images ✅' if cache else 'not caching images ⚠️'}"
             )
         return cache

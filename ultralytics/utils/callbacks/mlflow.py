@@ -34,7 +34,9 @@ try:
     from pathlib import Path
 
     PREFIX = colorstr("MLflow: ")
-    SANITIZE = lambda x: {k.replace("(", "").replace(")", ""): float(v) for k, v in x.items()}
+
+    def SANITIZE(x):
+        return {k.replace("(", "").replace(")", ""): float(v) for k, v in x.items()}
 
 except (ImportError, AssertionError):
     mlflow = None
@@ -80,7 +82,7 @@ def on_pretrain_routine_end(trainer):
         LOGGER.info(f"{PREFIX}disable with 'yolo settings mlflow=False'")
         mlflow.log_params(dict(trainer.args))
     except Exception as e:
-        LOGGER.warning(f"{PREFIX}WARNING ⚠️ Failed to initialize: {e}\n" f"{PREFIX}WARNING ⚠️ Not tracking this run")
+        LOGGER.warning(f"{PREFIX}WARNING ⚠️ Failed to initialize: {e}\n{PREFIX}WARNING ⚠️ Not tracking this run")
 
 
 def on_train_epoch_end(trainer):
@@ -116,8 +118,7 @@ def on_train_end(trainer):
             LOGGER.debug(f"{PREFIX}mlflow run ended")
 
         LOGGER.info(
-            f"{PREFIX}results logged to {mlflow.get_tracking_uri()}\n"
-            f"{PREFIX}disable with 'yolo settings mlflow=False'"
+            f"{PREFIX}results logged to {mlflow.get_tracking_uri()}\n{PREFIX}disable with 'yolo settings mlflow=False'"
         )
 
 

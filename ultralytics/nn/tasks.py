@@ -15,14 +15,17 @@ from ultralytics.nn.modules import (
     C3TR,
     OBB,
     SPP,
+    SPPELAN,
     SPPF,
+    ADown,
     Bottleneck,
     BottleneckCSP,
     C2f,
     C2fAttn,
-    ImagePoolingAttn,
     C3Ghost,
     C3x,
+    CBFuse,
+    CBLinear,
     Classify,
     Concat,
     Conv,
@@ -36,19 +39,15 @@ from ultralytics.nn.modules import (
     GhostConv,
     HGBlock,
     HGStem,
+    ImagePoolingAttn,
     Pose,
     RepC3,
     RepConv,
+    RepNCSPELAN4,
     ResNetLayer,
     RTDETRDecoder,
     Segment,
     WorldDetect,
-    RepNCSPELAN4,
-    ADown,
-    SPPELAN,
-    CBFuse,
-    CBLinear,
-    Silence,
 )
 from ultralytics.utils import DEFAULT_CFG_DICT, DEFAULT_CFG_KEYS, LOGGER, colorstr, emojis, yaml_load
 from ultralytics.utils.checks import check_requirements, check_suffix, check_yaml
@@ -130,10 +129,9 @@ class BaseModel(nn.Module):
             if visualize:
                 feature_visualization(x, m.type, m.i, save_dir=visualize)
             if embed and m.i in embed:
-                embeddings.append(nn.functional.adaptive_avg_pool2d(x, (1, 1)).squeeze(-1).squeeze(-1))  # flatten
-                if m.i == max(embed):
-                    return torch.unbind(torch.cat(embeddings, 1), dim=0)
-        return x
+                embeddings.append(x)
+
+        return x, embeddings
 
     def _predict_augment(self, x):
         """Perform augmentations on input image x and return augmented inference."""
@@ -293,7 +291,10 @@ class DetectionModel(BaseModel):
         if isinstance(m, Detect):  # includes all Detect subclasses like Segment, Pose, OBB, WorldDetect
             s = 256  # 2x min stride
             m.inplace = self.inplace
-            forward = lambda x: self.forward(x)[0] if isinstance(m, (Segment, Pose, OBB)) else self.forward(x)
+
+            def forward(x):
+                return self.forward(x)[0] if isinstance(m, (Segment, Pose, OBB)) else self.forward(x)
+
             m.stride = torch.tensor([s / x.shape[-2] for x in forward(torch.zeros(1, ch, s, s))])  # forward
             self.stride = m.stride
             m.bias_init()  # only run once
@@ -746,7 +747,6 @@ def torch_safe_load(weight):
 
 def attempt_load_weights(weights, device=None, inplace=True, fuse=False):
     """Loads an ensemble of models weights=[a,b,c] or a single model weights=[a] or weights=a."""
-
     ensemble = Ensemble()
     for w in weights if isinstance(weights, list) else [weights]:
         ckpt, w = torch_safe_load(w)  # load ckpt

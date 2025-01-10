@@ -44,12 +44,7 @@ The VSCode compatible protocols for viewing images using the integrated terminal
 1. Import the relevant libraries
 
     ```py
-    import io
 
-    import cv2 as cv
-
-    from ultralytics import YOLO
-    from sixel import SixelWriter
     ```
 
 1. Load a model and execute inference, then plot the results and store in a variable. See more about inference arguments and working with results on the [predict mode](../modes/predict.md) page.
@@ -62,9 +57,9 @@ The VSCode compatible protocols for viewing images using the integrated terminal
 
     # Run inference on an image
     results = model.predict(source="ultralytics/assets/bus.jpg")
-    
+
     # Plot inference results
-    plot = results[0].plot() #(1)!
+    plot = results[0].plot()  # (1)!
     ```
 
     1. See [plot method parameters](../modes/predict.md#plot-method-parameters) to see possible arguments to use.
@@ -74,9 +69,9 @@ The VSCode compatible protocols for viewing images using the integrated terminal
     ```{ .py .annotate }
     # Results image as bytes
     im_bytes = cv.imencode(
-        ".png", #(1)!
+        ".png",  # (1)!
         plot,
-        )[1].tobytes() #(2)!
+    )[1].tobytes()  # (2)!
 
     # Image bytes as a file-like object
     mem_file = io.BytesIO(im_bytes)
@@ -111,9 +106,9 @@ The VSCode compatible protocols for viewing images using the integrated terminal
 import io
 
 import cv2 as cv
+from sixel import SixelWriter
 
 from ultralytics import YOLO
-from sixel import SixelWriter
 
 # Load a model
 model = YOLO("yolov8n.pt")
@@ -122,13 +117,13 @@ model = YOLO("yolov8n.pt")
 results = model.predict(source="ultralytics/assets/bus.jpg")
 
 # Plot inference results
-plot = results[0].plot() #(3)!
+plot = results[0].plot()  # (3)!
 
 # Results image as bytes
 im_bytes = cv.imencode(
-    ".png", #(1)!
+    ".png",  # (1)!
     plot,
-    )[1].tobytes() #(2)!
+)[1].tobytes()  # (2)!
 
 mem_file = io.BytesIO(im_bytes)
 w = SixelWriter()

@@ -38,7 +38,7 @@ This guide assumes that you already have a working Raspberry Pi OS install and h
 First, we need to install the Edge TPU runtime. There are many different versions available, so you need to choose the right version for your operating system.
 
 | Raspberry Pi OS | High frequency mode | Version to download                        |
-|-----------------|:-------------------:|--------------------------------------------|
+| --------------- | :-----------------: | ------------------------------------------ |
 | Bullseye 32bit  |         No          | `libedgetpu1-std_ ... .bullseye_armhf.deb` |
 | Bullseye 64bit  |         No          | `libedgetpu1-std_ ... .bullseye_arm64.deb` |
 | Bullseye 32bit  |         Yes         | `libedgetpu1-max_ ... .bullseye_armhf.deb` |
@@ -64,10 +64,10 @@ After installing the runtime, you need to plug in your Coral Edge TPU into a USB
 
     ```bash
     # If you installed the standard version
-    sudo apt remove libedgetpu1-std 
+    sudo apt remove libedgetpu1-std
 
     # If you installed the high frequency version
-    sudo apt remove libedgetpu1-max 
+    sudo apt remove libedgetpu1-max
     ```
 
 ## Export your model to a Edge TPU compatible model
@@ -82,10 +82,10 @@ To use the Edge TPU, you need to convert your model into a compatible format. It
         from ultralytics import YOLO
 
         # Load a model
-        model = YOLO('path/to/model.pt')  # Load a official model or custom model
+        model = YOLO("path/to/model.pt")  # Load a official model or custom model
 
         # Export the model
-        model.export(format='edgetpu')
+        model.export(format="edgetpu")
         ```
 
     === "CLI"
@@ -108,7 +108,7 @@ After exporting your model, you can run inference with it using the following co
         from ultralytics import YOLO
 
         # Load a model
-        model = YOLO('path/to/edgetpu_model.tflite')  # Load a official model or custom model
+        model = YOLO("path/to/edgetpu_model.tflite")  # Load a official model or custom model
 
         # Run Prediction
         model.predict("path/to/source.png")
