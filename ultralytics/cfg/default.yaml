@@ -28,6 +28,7 @@ verbose: True # (bool) whether to print verbose output
 seed: 0 # (int) random seed for reproducibility
 deterministic: True # (bool) whether to enable deterministic mode
 single_cls: False # (bool) train multi-class data as single-class
+cls_weights: # (list, optional) class weights for loss function, i.e. cls_weights=[1.0, 1.0, 1.0]
 rect: False # (bool) rectangular training if mode='train' or rectangular validation if mode='val'
 cos_lr: False # (bool) use cosine learning rate scheduler
 close_mosaic: 10 # (int) disable mosaic augmentation for final epochs (0 to disable)
